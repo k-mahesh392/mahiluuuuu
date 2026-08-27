@@ -1,6 +1,6 @@
 const STORAGE_KEY = "mahili-birthday-story-v1";
 const initialState = {
-  contentVersion: 3,
+  contentVersion: 4,
   page: "wish",
   name: "mahiiiiiiiii / mahiluuuuuuu",
   wish: "Happy birthday to the person who makes my ordinary days feel like something worth keeping. I made you a tiny little world because you deserve a big, impossible kind of love.",
@@ -39,18 +39,18 @@ function loadState() {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
     const saved = { ...initialState, ...stored };
+    if (Array.isArray(stored.chapters)) {
+      saved.chapters = initialState.chapters.map(defaultChapter => {
+        const storedChapter = stored.chapters.find(chapter => chapter.id === defaultChapter.id);
+        return { ...defaultChapter, ...storedChapter, photo: storedChapter?.photo || defaultChapter.photo };
+      });
+    }
     if (stored.contentVersion !== initialState.contentVersion) {
       saved.contentVersion = initialState.contentVersion;
       saved.final = initialState.final;
       saved.chapters = initialState.chapters.map(chapter => {
         const storedChapter = saved.chapters.find(item => item.id === chapter.id);
         return { ...chapter, ...storedChapter, message: chapter.message };
-      });
-    }
-    if (Array.isArray(stored.chapters)) {
-      saved.chapters = initialState.chapters.map(defaultChapter => {
-        const storedChapter = stored.chapters.find(chapter => chapter.id === defaultChapter.id);
-        return { ...defaultChapter, ...storedChapter, photo: storedChapter?.photo || defaultChapter.photo };
       });
     }
     delete saved.noShown;
